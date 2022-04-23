@@ -69,6 +69,7 @@
       <h1 class="sr-only">Sneakers Store Product Page</h1>
 
       <div
+        tabindex="0"
         class="relative"
         x-data="{
           currentItem: 0,
@@ -78,7 +79,6 @@
           startPosition: 0,
           currentTranslate: 0,
           prevTranslate: 0,
-          animationId: 0,
 
           animation() {
             $refs.sliderBody.style.transform = `translateX(${this.currentTranslate}px)`;
@@ -87,33 +87,58 @@
 
           startAnimation() {
             this.animation = this.animation.bind(this);
-            this.animationId = requestAnimationFrame(this.animation);
-            console.log('test');
+            requestAnimationFrame(this.animation);
           },
+
+          shift(offset) {
+            if (this.dragging) {
+              return;
+            }
+            if (
+              this.currentItem === 0 && offset < 0 ||
+              this.currentItem === this.itemsCount - 1 && offset > 0
+            ) {
+              return;
+            }
+            this.currentItem += offset;
+            $dispatch('update-slider-body');
+          }
         }"
 
-        @resize.window="
+        @update-slider-body="
           currentTranslate = currentItem * (-$refs.sliderWindow.clientWidth);
-          $el.style.transform = `translateX(${this.currentTranslate}px)`;
+          prevTranslate = currentTranslate;
+          $refs.sliderBody.style.transform = `translateX(${currentTranslate}px)`;
         "
 
-        x-ref="sliderWindow"
+        @resize.window="
+          if (dragging) {
+            return;
+          }
+          $dispatch('update-slider-body');
+        "
+
+        @keydown.left="shift(-1)"
+        @keydown.right="shift(1)"
       >
         <div
           class="overflow-hidden"
           x-ref="sliderWindow"
         >
-          <div class="flex transition" x-ref="sliderBody">
-            <template
-              x-for="i in [0, 1, 2, 3]"
-            >
+          <div
+            class="flex"
+            :class="{ 'transition': !dragging }"
+            x-ref="sliderBody"
+            x-init="startAnimation()"
+          >
+            <template x-for="i in Array.from(Array(itemsCount).keys())">
               <div
                 class="h-[50vh] shrink-0 w-full"
+
                 @touchstart.passive="
                   currentItem = i;
                   startPosition = $event.touches[0].clientX;
                   dragging = true;
-                  startAnimation();
                 "
 
                 @touchmove.passive="
@@ -126,7 +151,6 @@
 
                 @touchend.passive="
                   dragging = false;
-                  cancelAnimationFrame(animationId);
                   const movedBy = currentTranslate - prevTranslate;
                   if (movedBy < -100 && currentItem < itemsCount - 1) {
                     ++currentItem;
@@ -135,9 +159,7 @@
                     --currentItem;
                   }
 
-                  currentTranslate = currentItem * (-$refs.sliderWindow.clientWidth);
-                  prevTranslate = currentTranslate;
-                  $refs.sliderBody.style.transform = `translateX(${this.currentTranslate}px)`;
+                  $dispatch('update-slider-body');
                 "
               >
                 <img
@@ -154,7 +176,7 @@
         <button
           aria-label="Previous image"
           class="absolute left-4 top-1/2 -translate-y-1/2 bg-white rounded-full p-2 shadow-md hover:bg-slate-100 active:bg-slate-200 transition"
-          @click.throttle.300ms="shift(-1)"
+          @click="shift(-1)"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -175,7 +197,7 @@
         <button
           aria-label="Next image"
           class="absolute right-4 top-1/2 -translate-y-1/2 bg-white rounded-full p-2 shadow-md hover:bg-slate-100 active:bg-slate-200 transition"
-          @click.throttle.300ms="shift(1)"
+          @click="shift(1)"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
