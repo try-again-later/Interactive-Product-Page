@@ -7,13 +7,16 @@ function getImageUrl(name: string, fileExtension: string = 'jpg') {
 }
 
 document.addEventListener('alpine:initialized', () => {
-  const images = document.querySelectorAll('[data-product-image]');
-  (images[0] as HTMLImageElement).src = getImageUrl('product-4');
-  (images[1] as HTMLImageElement).src = getImageUrl('product-1');
-  (images[2] as HTMLImageElement).src = getImageUrl('product-2');
-  (images[3] as HTMLImageElement).src = getImageUrl('product-3');
-  (images[4] as HTMLImageElement).src = getImageUrl('product-4');
-  (images[5] as HTMLImageElement).src = getImageUrl('product-1');
+  const images: NodeListOf<HTMLImageElement> = document.querySelectorAll('[data-product-image]');
+  const urls = [
+    getImageUrl('product-4'),
+    getImageUrl('product-1'),
+    getImageUrl('product-2'),
+    getImageUrl('product-3'),
+    getImageUrl('product-4'),
+    getImageUrl('product-1'),
+  ];
+  images.forEach((image, i) => { image.src = urls[i]; });
 });
 
 Alpine.start();
