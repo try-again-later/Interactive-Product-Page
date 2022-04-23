@@ -4,8 +4,8 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Interactive Product Page</title>
-    <script type="module" crossorigin src="/Interactive-Product-Page/assets/main.aa0a8945.js"></script>
-    <link rel="stylesheet" href="/Interactive-Product-Page/assets/main.a8ecb35d.css">
+    <script type="module" crossorigin src="/Interactive-Product-Page/assets/main.d7f81217.js"></script>
+    <link rel="stylesheet" href="/Interactive-Product-Page/assets/main.cfcb0d16.css">
   </head>
   <body>
     <header>
@@ -75,81 +75,82 @@
         x-data="{
           currentItem: 0,
           itemsCount: 4,
-          sliding: 0,
 
-          handleEdgeCase(offset) {
-            if (this.currentItem === -1 && offset < 0) {
-              this.currentItem = this.itemsCount - 1;
-            }
-            if (this.currentItem === this.itemsCount && offset > 0) {
-              this.currentItem = 0;
-            }
+          dragging: false,
+          startPosition: 0,
+          currentTranslate: 0,
+          prevTranslate: 0,
+          animationId: 0,
 
-            this.sliding = 0;
+          animation() {
+            $refs.sliderBody.style.transform = `translateX(${this.currentTranslate}px)`;
+            requestAnimationFrame(this.animation);
           },
 
-          shift(offset) {
-            this.sliding = offset;
-            this.currentItem = this.currentItem + offset;
-          }
+          startAnimation() {
+            this.animation = this.animation.bind(this);
+            this.animationId = requestAnimationFrame(this.animation);
+            console.log('test');
+          },
         }"
+
+        @resize.window="
+          currentTranslate = currentItem * (-$refs.sliderWindow.clientWidth);
+          $el.style.transform = `translateX(${this.currentTranslate}px)`;
+        "
+
+        x-ref="sliderWindow"
       >
         <div
-          class="flex overflow-hidden"
-          x-data="{
-            touching: false,
-            touchStartX: 0,
-            touchEndX: 0,
-          }"
-
-          @touchstart.passive="
-            if (sliding || touching) {
-              return;
-            }
-            touching = true;
-            touchStartX = $event.touches[0].clientX;
-            touchEndX = touchStartX;
-          "
-
-          @touchmove.passive="
-            touchEndX = $event.touches[0].clientX;
-          "
-
-          @touchend.passive="
-            if (!touching) {
-              return;
-            }
-
-            touching = false;
-            sliding = Math.sign(touchStartX - touchEndX);
-            if (Math.abs(touchStartX - touchEndX) > 100) {
-              shift(Math.sign(touchStartX - touchEndX));
-            }
-          "
-
-          @transitionend="
-            if (touching || !sliding) {
-              return;
-            }
-            handleEdgeCase(sliding);
-          "
+          class="overflow-hidden"
+          x-ref="sliderWindow"
         >
-          <template
-            x-for="i in [itemsCount, ...Array.from({length: itemsCount}, (_, i) => i + 1), 1]"
-          >
-            <div
-              class="h-[50vh] shrink-0 w-full"
-              :class="{ 'transition-transform': !!sliding, 'duration-300': !!sliding }"
-              :style="{ transform: `translatex(calc(${-100 * (currentItem + 1)}% + ${touching ? touchEndX - touchStartX : 0}px))` }"
+          <div class="flex transition" x-ref="sliderBody">
+            <template
+              x-for="i in [0, 1, 2, 3]"
             >
-              <img
-                src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs="
-                alt="Product image"
-                class="h-full w-full object-cover"
-                data-product-image
-              />
-            </div>
-          </template>
+              <div
+                class="h-[50vh] shrink-0 w-full"
+                @touchstart.passive="
+                  currentItem = i;
+                  startPosition = $event.touches[0].clientX;
+                  dragging = true;
+                  startAnimation();
+                "
+
+                @touchmove.passive="
+                  if (!dragging) {
+                    return;
+                  }
+                  const currentPosition = $event.touches[0].clientX;
+                  currentTranslate = prevTranslate + currentPosition - startPosition;
+                "
+
+                @touchend.passive="
+                  dragging = false;
+                  cancelAnimationFrame(animationId);
+                  const movedBy = currentTranslate - prevTranslate;
+                  if (movedBy < -100 && currentItem < itemsCount - 1) {
+                    ++currentItem;
+                  }
+                  if (movedBy > 100 && currentItem > 0) {
+                    --currentItem;
+                  }
+
+                  currentTranslate = currentItem * (-$refs.sliderWindow.clientWidth);
+                  prevTranslate = currentTranslate;
+                  $refs.sliderBody.style.transform = `translateX(${this.currentTranslate}px)`;
+                "
+              >
+                <img
+                  src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs="
+                  alt="Product image"
+                  class="h-full w-full object-cover"
+                  data-product-image
+                />
+              </div>
+            </template>
+          </div>
         </div>
 
         <button
