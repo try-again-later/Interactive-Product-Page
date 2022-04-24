@@ -19,6 +19,10 @@
       before:transition
       active:before:bg-slate-200
       hover:before:scale-150
-      hover:before:opacity-100
+      hover:before:opacity-100;
+  }
+
+  [x-cloak] {
+    display: none !important;
   }
 }
