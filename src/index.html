@@ -24,7 +24,7 @@
     }"
   >
     <header>
-      <nav class="flex flex-wrap gap-2.5 items-center p-4">
+      <nav class="flex flex-wrap gap-2.5 items-center p-4 bg-gray-50">
         <div
           class="text-2xl"
           x-data="{ burgerMenuOpened: false }"
@@ -82,6 +82,7 @@
             x-cloak
             :class="{ '-translate-x-0': burgerMenuOpened }"
             x-trap="burgerMenuOpened"
+            @keydown.window.escape="burgerMenuOpened = false"
           >
             <button
               aria-label="Close menu"
@@ -136,7 +137,7 @@
               x-show="itemsTotalCount > 0"
               x-transition
               class="
-                absolute right-0 top-0 bg-orange-500 px-1 py-0.5 rounded-full
+                absolute right-0 top-0 bg-orange-500 px-1 py-0.5 rounded-full transition
                 text-white text-xs
                 -translate-y-1/4 translate-x-1/4
                 max-w-full min-w-[1.5rem]
@@ -166,16 +167,39 @@
 
           <template x-teleport="main">
             <section
+              x-data="{
+                get tabindexValue() {
+                  return cartOpened ? '0' : '-1';
+                }
+              }"
               class="
-                absolute bg-white z-10 inset-x-2 top-2 rounded-xl divide-gray-100 divide-y-2
+                absolute bg-white z-10 inset-x-2 top-2 rounded-xl
                 shadow-xl shadow-black/30
               "
               x-show="cartOpened"
               x-transition
-              x-data
               @click.outside="cartOpened = false"
+              x-trap="cartOpened"
+              @keydown.window.escape="cartOpened = false"
             >
-              <h2 class="font-bold text-lg py-4 px-6">Cart</h2>
+              <h2 class="font-bold text-lg py-4 px-6 border-b-2 border-gray-100">Cart</h2>
+
+              <button
+                class="absolute top-4 right-4 opacity-0 focus:opacity-100"
+                @click="cartOpened = false"
+                aria-label="Close cart"
+                :tabindex="tabindexValue"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  class="h-6 w-6"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor" stroke-width="2"
+                >
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
 
               <template x-if="cartItems.length === 0">
                 <div
@@ -203,7 +227,9 @@
                         >
                         <div class="min-w-0 flex-1">
                           <p class="text-ellipsis whitespace-nowrap overflow-hidden w-full">
-                            <a href="#">Autumun Limited Edition Sneakers</a>
+                            <a href="#" :tabindex="tabindexValue">
+                              Autumun Limited Edition Sneakers
+                            </a>
                           </p>
                           <p class="flex flex-wrap gap-1">
                             <span
@@ -226,6 +252,7 @@
                         </div>
 
                         <button
+                          :tabindex="tabindexValue"
                           aria-label="Remove from shopping cart"
                           x-data
                           @click="
@@ -283,13 +310,60 @@
           </template>
         </div>
 
-        <a
-          href="#"
-          aria-label="Link to your profile"
-          class="relative circle-background-button"
+        <div
+          x-data="{
+            profileMenuOpened: false
+          }"
+          class="grid place-items-center relative"
         >
-          <img src="img/avatar.png" alt="Your avatar image" class="h-8 w-8" />
-        </a>
+          <button
+            aria-label="Open your profile options"
+            class="relative circle-background-button"
+            @click="profileMenuOpened = !profileMenuOpened"
+          >
+            <img src="img/avatar.png" alt="Your avatar image" class="h-8 w-8" />
+          </button>
+
+          <div
+            class="
+              absolute bg-white shadow-md top-10 right-0 w-max min-w-[10rem] z-10
+              rounded-md
+            "
+            x-show="profileMenuOpened"
+            x-transition
+            @click.outside="profileMenuOpened = false"
+
+          >
+            <ul>
+              <li class="grid place-items-stretch hover:bg-gray-200 rounded-t-md">
+                <a class="px-3 py-2 flex gap-1.5 items-center" href="#">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd" />
+                  </svg>
+                  <span>My Profile</span>
+                </a>
+              </li>
+
+              <li class="grid place-items-stretch hover:bg-gray-200">
+                <a class="px-3 py-2 flex gap-2 items-center" href="#">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd" />
+                  </svg>
+                  <span>Settings</span>
+                </a>
+              </li>
+
+              <li class="grid place-items-stretch hover:bg-gray-200 rounded-b-md border-t-2 border-gray-300">
+                <a class="px-3 py-2 flex gap-2 items-center" href="#">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                  </svg>
+                  <span>Log Out</span>
+                </a>
+              </li>
+            </ul>
+          </div>
+        </div>
       </nav>
     </header>
 
