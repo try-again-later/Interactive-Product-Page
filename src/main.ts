@@ -1,6 +1,7 @@
 import './main.css';
 
 import Alpine from 'alpinejs';
+import focus from '@alpinejs/focus';
 
 function getImageUrl(name: string, fileExtension: string = 'jpg') {
   return new URL(`./img/${name}.${fileExtension}`, import.meta.url).href
@@ -17,4 +18,5 @@ document.addEventListener('alpine:initialized', () => {
   images.forEach((image, i) => { image.src = urls[i]; });
 });
 
+Alpine.plugin(focus);
 Alpine.start();
