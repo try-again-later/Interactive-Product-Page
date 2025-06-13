@@ -4,6 +4,7 @@ const { defineConfig } = require('vite');
 module.exports = defineConfig({
   base: '/Interactive-Product-Page/',
   root: './src',
+  publicDir: '../public',
   build: {
     rollupOptions: {
       input: {
@@ -11,13 +12,5 @@ module.exports = defineConfig({
       },
     },
     outDir: resolve(__dirname, 'dist'),
-  },
-  resolve: {
-    alias: [
-      {
-        find: '@root',
-        replacement: resolve(__dirname, 'src'),
-      },
-    ],
   },
 });
