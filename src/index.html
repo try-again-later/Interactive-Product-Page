@@ -26,7 +26,7 @@
     <header>
       <nav class="flex flex-wrap gap-2.5 items-center p-4 bg-gray-50">
         <div
-          class="text-2xl"
+          class="text-2xl lg:flex lg:grow lg:items-center"
           x-data="{ burgerMenuOpened: false }"
           x-init="$watch('burgerMenuOpened', value => {
             if (value) {
@@ -37,7 +37,7 @@
           })"
         >
           <button
-            class="relative circle-background-button group align-bottom"
+            class="relative circle-background-button group align-bottom lg:hidden"
             aria-label="Open side menu"
             x-data
             @click="burgerMenuOpened = true"
@@ -59,12 +59,12 @@
           </button>
 
           <div
-            class="fixed left-0 top-0 h-screen w-screen z-40 bg-black transition"
+            class="fixed left-0 top-0 h-screen w-screen z-40 bg-black lg:hidden"
             x-data
             :class="{
               'pointer-events-none': !burgerMenuOpened,
-              'bg-opacity-50': burgerMenuOpened,
-              'bg-opacity-0': !burgerMenuOpened,
+              'bg-black/50': burgerMenuOpened,
+              'bg-black/0': !burgerMenuOpened,
             }"
             @click="burgerMenuOpened = false"
           >
@@ -73,6 +73,7 @@
           <div
             class="
               fixed left-0 top-0 h-screen z-50 bg-white p-4 pr-16 -translate-x-full transition
+              lg:static lg:h-auto lg:pr-0 lg:translate-none lg:p-0 lg:ml-auto lg:mr-auto lg:transition-none
             "
             x-data="{
               get tabindexValue() {
@@ -80,13 +81,13 @@
               }
             }"
             x-cloak
-            :class="{ '-translate-x-0': burgerMenuOpened }"
+            :class="{ 'translate-none': burgerMenuOpened }"
             x-trap="burgerMenuOpened"
             @keydown.window.escape="burgerMenuOpened = false"
           >
             <button
               aria-label="Close menu"
-              class="mb-8 relative circle-background-button group"
+              class="mb-8 relative circle-background-button group lg:hidden"
               x-data
               @click="burgerMenuOpened = false"
               :tabindex="tabindexValue"
@@ -102,7 +103,10 @@
                 <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
               </svg>
             </button>
-            <ul class="text-lg font-bold space-y-3 ml-2">
+            <ul class="
+              text-lg font-bold space-y-3 ml-2
+              lg:flex lg:gap-5 lg:space-y-0 lg:font-normal lg:text-neutral-500
+            ">
               <template x-for="link in ['Collections', 'Men', 'Women', 'About', 'Contact']">
                 <li>
                   <a
@@ -119,7 +123,7 @@
 
           <a
             href="#"
-            class="font-bold lowercase hover:text-orange-500 transition ml-2"
+            class="font-bold lowercase hover:text-orange-500 transition ml-2 lg:-order-1"
             aria-label="Link to the home page"
           >
             Sneakers
@@ -173,8 +177,8 @@
                 }
               }"
               class="
-                absolute bg-white z-10 inset-x-2 top-2 rounded-xl
-                shadow-xl shadow-black/30
+                absolute bg-white z-10 inset-x-2 top-2 rounded-xl shadow-xl shadow-black/30
+                lg:inset-auto lg:top-4 lg:right-4 lg:w-max lg:min-w-md
               "
               x-show="cartOpened"
               x-transition
@@ -376,6 +380,12 @@
         x-data="{
           currentItem: 0,
           itemsCount: 4,
+          itemUrls: [
+            './img/product-1.jpg',
+            './img/product-2.jpg',
+            './img/product-3.jpg',
+            './img/product-4.jpg',
+          ],
 
           dragging: false,
           startPosition: 0,
@@ -433,7 +443,7 @@
             x-ref="sliderBody"
             x-init="startAnimation()"
           >
-            <template x-for="i in Array.from(Array(itemsCount).keys())">
+            <template x-for="(url, i) in itemUrls">
               <div
                 class="h-[50vh] shrink-0 w-full"
 
@@ -465,7 +475,7 @@
                 "
               >
                 <img
-                  src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs="
+                  :src="url"
                   alt="Product image"
                   class="h-full w-full object-cover"
                   data-product-image
