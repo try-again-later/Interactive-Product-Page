@@ -1,6 +1,18 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+
+@theme {
+  --animate-pulseScale: pulseScale 200ms ease-out forwards;
+
+  @keyframes pulseScale {
+    0%, 100% {
+      transform: scale(1);
+    }
+
+    40% {
+      transform: scale(1.25);
+    }
+  }
+}
 
 @layer utilities {
   .circle-background-button {
