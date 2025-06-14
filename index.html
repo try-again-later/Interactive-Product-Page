@@ -4,8 +4,8 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Interactive Product Page</title>
-    <script type="module" crossorigin src="/Interactive-Product-Page/assets/main-ClCs2CzI.js"></script>
-    <link rel="stylesheet" crossorigin href="/Interactive-Product-Page/assets/main-56em2Jbr.css">
+    <script type="module" crossorigin src="/Interactive-Product-Page/assets/main-CnsuoJUn.js"></script>
+    <link rel="stylesheet" crossorigin href="/Interactive-Product-Page/assets/main-BppLyIdA.css">
   </head>
 
   <body
@@ -379,6 +379,7 @@
           ],
         }"
       >
+        <!-- Mobile carousel gallery -->
         <div
           tabindex="0"
           class="relative lg:hidden"
@@ -536,12 +537,33 @@
           </button>
         </div>
 
-        <div class="hidden p-4 lg:block flex-1 space-y-4">
-          <img src="product-1.jpg" class="rounded-2xl" />
+        <!-- Desktop gallery -->
+        <div
+          x-data="{
+            selectedItemUrl: 'product-1.jpg',
+          }"
+          class="hidden p-4 lg:block flex-1 space-y-4"
+        >
+          <img :src="selectedItemUrl" class="rounded-2xl" />
           <div class="flex gap-4 w-full">
             <template x-for="(url, i) in itemUrls">
-              <div>
-                <img :src="url" class="rounded-lg w-full" />
+              <div
+                class="rounded-lg"
+                :class="{
+                  'outline-3 outline-orange-600': url === selectedItemUrl,
+                }"
+              >
+                <button
+                  class="relative bg-white transition rounded-[inherit] block"
+                  :class="{
+                    'cursor-pointer': url !== selectedItemUrl,
+                    'hover:opacity-75': url !== selectedItemUrl,
+                    'hover:opacity-50 opacity-50': url === selectedItemUrl,
+                  }"
+                  @click="selectedItemUrl = url"
+                >
+                  <img :src="url" class="w-full rounded-[inherit]" />
+                </button>
               </div>
             </template>
           </div>
