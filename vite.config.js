@@ -1,7 +1,7 @@
-const { resolve } = require('path');
-const { defineConfig } = require('vite');
+import {resolve} from 'path';
+import {defineConfig} from 'vite';
 
-module.exports = defineConfig({
+export default defineConfig({
   base: '/Interactive-Product-Page/',
   root: './src',
   publicDir: '../public',
